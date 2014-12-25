@@ -17,8 +17,3 @@ Simply run `linkdups` on a directory to create symbolic links between duplicate 
 Optionally, you can make `linkdups` create hard links rather than symbolic links:
 
     linkdups -hard /path/to/directory
-
-# TODO
-
- * Use "path/filepath" for computing absolute paths
- * Support relative symlinks

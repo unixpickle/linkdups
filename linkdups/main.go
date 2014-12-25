@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"github.com/unixpickle/linkdups"
 	"os"
-	pathlib "path"
+	"path/filepath"
 )
 
 func main() {
 	hardlink := flag.Bool("hard", false, "Use hard links")
+	absolute := flag.Bool("absolute", false, "Use absolute symbolic links")
 	follow := flag.Bool("follow", false, "Follow symlinks when scanning")
 	flag.Parse()
 
@@ -18,16 +19,16 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Usage: linkdups [flags] <directory path>")
 		os.Exit(1)
 	}
-	absPath := flag.Arg(0)
-	if !pathlib.IsAbs(absPath) {
-		wd, _ := os.Getwd()
-		absPath = pathlib.Clean(pathlib.Join(wd, absPath))
+	absPath, err := filepath.Abs(flag.Arg(0))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
 	// Generate the sums
 	sums := linkdups.NewSumsSHA256()
 	sums.FollowLinks = *follow
-	linker := linkdups.Linker{!*hardlink}
+	linker := linkdups.Linker{!*hardlink, !*absolute}
 	files, err := sums.Compute(absPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

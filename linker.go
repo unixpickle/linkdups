@@ -1,9 +1,13 @@
 package linkdups
 
-import "os"
+import (
+	"os"
+	"path/filepath"
+)
 
 type Linker struct {
 	Symlinks bool
+	Relative bool
 }
 
 func (l *Linker) LinkDuplicates(listing map[string][]string) error {
@@ -29,6 +33,15 @@ func (l *Linker) Link(source, dest string) error {
 	if !l.Symlinks {
 		return os.Link(source, dest)
 	} else {
-		return os.Symlink(source, dest)
+		if l.Relative {
+			dir := filepath.Dir(dest)
+			rel, err := filepath.Rel(dir, source)
+			if err != nil {
+				return err
+			}
+			return os.Symlink(rel, dest)
+		} else {
+			return os.Symlink(source, dest)
+		}
 	}
 }
