@@ -12,7 +12,7 @@ func main() {
 	hardlink := flag.Bool("hard", false, "Use hard links")
 	follow := flag.Bool("follow", false, "Follow symlinks when scanning")
 	flag.Parse()
-	
+
 	// Get the path argument
 	if len(flag.Args()) != 1 {
 		fmt.Fprintln(os.Stderr, "Usage: linkdups [flags] <directory path>")
@@ -23,7 +23,7 @@ func main() {
 		wd, _ := os.Getwd()
 		absPath = pathlib.Clean(pathlib.Join(wd, absPath))
 	}
-	
+
 	// Generate the sums
 	sums := linkdups.NewSumsSHA256()
 	sums.FollowLinks = *follow
@@ -33,7 +33,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	
+
 	// Create the links
 	if err := linker.LinkDuplicates(files); err != nil {
 		fmt.Fprintln(os.Stderr, err)
